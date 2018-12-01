@@ -1,0 +1,49 @@
+displayName: Authentication
+/token:
+  post:
+    description: Create an access token that allows user to authenticate.
+    queryParameters:
+      email: string
+      password: string
+      grant_type:
+        enum: ["password"]
+    responses:
+      200:
+        body:
+          type: AccessToken
+      401:
+        body:
+          type: Error
+          example: |
+            {
+              "error": "invalid_grant",
+              "error_description": "The provided authorization grant is invalid, expired, revoked, does not match the redirection URI used in the authorization request, or was issued to another client."
+            }
+
+  /info:
+    get:
+      description: Retrieve details about the token used for authentication.
+      securedBy: [oauth]
+      responses:
+        200:
+          body:
+            type: AccessTokenInfo
+        401:
+          body:
+            type: Error
+            example: |
+              {
+                "error": "invalid_request",
+                "error_description": "The request is missing a required parameter, includes an unsupported parameter value, or is otherwise malformed."
+              }
+
+/revoke:
+  post:
+    description: Revoke the given token.
+    securedBy: [oauth]
+    responses:
+      200:
+        description: Always returns 200 OK, even if token doesn't exist or has already been revoked.
+        body:
+          example: |
+            {}

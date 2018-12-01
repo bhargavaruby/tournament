@@ -1,0 +1,13 @@
+displayName: Sign up
+/sign_up:
+  post:
+    description: Create a new user account.
+    is: [validatable]
+    body:
+      properties:
+        user: SignUpParams
+    responses:
+      201:
+        body:
+          properties:
+            user: User

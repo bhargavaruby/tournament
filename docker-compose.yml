@@ -1,0 +1,53 @@
+version: '3.3'
+
+services:
+  db:
+    image: postgres:9.6
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: tournaments-api-development
+    ports:
+      - '5432:5432'
+
+  docs:
+    image: mattjtodd/raml2html:latest
+    working_dir: /docs
+    command: -i index.raml -o index.html
+    volumes:
+      - ./docs:/docs
+
+#  redis:
+#    image: redis:latest
+#    ports:
+#      - '6379:6379'
+
+  schema:
+    image: sualeh/schemacrawler:latest
+    working_dir: /schemacrawler
+    command: ./schemacrawler.sh -infolevel=standard -command=schema -sortcolumns -portablenames -outputformat=pdf -outputfile=/docs/db-schema.pdf -server=postgresql -url="jdbc:postgresql://db:5432/tournaments-api-development" -u=postgres -password=postgres
+    links:
+      - db
+    volumes:
+      - ./docs:/docs
+
+  web:
+    build: .
+    working_dir: /tournaments-api
+    command: bash -c "rm -f tmp/pids/server.pid && bundle install && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    environment:
+      BUNDLE_PATH: /bundle_cache
+      GEM_HOME: /bundle_cache # without it spring cannot find gems
+      WEB_CONCURRENCY: 1
+    links:
+      - db
+#      - redis
+    ports:
+      - '3000:3000'
+    tty: true
+    stdin_open: true
+    volumes:
+      - .:/tournaments-api
+      - cache-volume:/bundle_cache
+
+volumes:
+  cache-volume:

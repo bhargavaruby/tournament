@@ -1,0 +1,93 @@
+displayName: Tournaments
+get:
+  description: Retrieve tournaments. Authentication is optional - when authenticated, retrieve only tournaments created by authenticated user. Tournaments are sorted by 'starts_at' (ascending).
+  securedBy: [oauth]
+  is: [
+    filterable: { typeName: Tournament },
+    paginated
+  ]
+  responses:
+    200:
+      body:
+        properties:
+          tournaments: Tournament[]
+post:
+  description: Create a new tournament.
+  securedBy: [oauth]
+  is: [authenticable, validatable]
+  body:
+    properties:
+      tournament: TournamentParams
+  responses:
+    201:
+      body:
+        properties:
+          tournament: Tournament
+
+/enlisted:
+  get:
+    description: Retrieve tournaments that currently authenticated user has enlisted in. Tournaments are sorted by 'starts_at' (ascending).
+    securedBy: [oauth]
+    is: [
+      filterable: { typeName: Tournament },
+      paginated
+    ]
+    responses:
+      200:
+        body:
+          properties:
+            tournaments: Tournament[]
+
+/{id}:
+  uriParameters:
+    id:
+      description: The id of the tournament
+      type: uuid
+  get:
+    description: Retrieve a tournament with relations.
+    is: [findable]
+    responses:
+      200:
+        body:
+          properties:
+            tournament: TournamentWithRelations
+  patch:
+    description: Update tournament details. User can update only tournaments he created.
+    securedBy: [oauth]
+    is: [authenticable, authorizable, findable, validatable]
+    body:
+      properties:
+        tournament: TournamentParams
+    responses:
+      200:
+        body:
+          properties:
+            tournament: Tournament
+  delete:
+    description: Remove a tournament. User can remove only tournaments he created.
+    securedBy: [oauth]
+    is: [authenticable, authorizable, findable]
+    responses:
+      204:
+
+  /start:
+    post:
+      description: Mark tournament as 'in progress'. User can start only tournaments he created and their 'starts_at' date is in the past.
+      securedBy: [oauth]
+      is: [authenticable, authorizable, findable]
+      responses:
+        200:
+          body:
+            properties:
+              tournament: Tournament
+
+  /end:
+    post:
+      description: Mark tournament as 'ended'. User can start only tournaments he created and were previously started.
+      securedBy: [oauth]
+      is: [authenticable, authorizable, findable]
+      responses:
+        200:
+          body:
+            properties:
+              tournament: Tournament

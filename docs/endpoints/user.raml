@@ -1,0 +1,21 @@
+displayName: User
+securedBy: [oauth]
+is: [authenticable]
+get:
+  description: Retrieve account details for currently authenticated user.
+  responses:
+    200:
+      body:
+        properties:
+          user: User
+patch:
+  description: Update account details for currently authenticated user.
+  is: [validatable]
+  body:
+    properties:
+      user: UserParams
+  responses:
+    200:
+      body:
+        properties:
+          user: User

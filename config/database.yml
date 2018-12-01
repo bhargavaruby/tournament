@@ -1,0 +1,22 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch('DATABASE_POOL', 5) %>
+
+development:
+  <<: *default
+  database: tournaments-api-development
+  username: postgres
+  password: pln0414
+  host: localhost
+
+test:
+  <<: *default
+  database: tournaments-api-test
+  username: postgres
+  password: postgres
+  host: db
+
+production:
+  <<: *default
+  url: <%= ENV['DATABASE_URL'] %>
